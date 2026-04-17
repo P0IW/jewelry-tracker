@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import "./App.css";
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://jewelry-tracker-dq0w.onrender.com/api";
 
 // ─── Axios auth interceptor ───────────────────────────────────────────────────
 const api = axios.create({ baseURL: API_URL });
