@@ -430,8 +430,8 @@ app.delete("/api/orders/:id", requireAuth, async (req, res) => {
 app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
 
 // Fallback → React
-app.use((req, res) => {
-  res.sendFile(join(__dirname, "dist", "index.html"));
+app.get("/", (req, res) => {
+  res.send("API is running 🚀");
 });
 
 const PORT = process.env.PORT || 3001;
