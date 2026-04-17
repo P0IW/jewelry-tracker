@@ -1,0 +1,16 @@
+# env
+.env
+
+# dependencies
+node_modules/
+
+# database
+*.db
+*.db-shm
+*.db-wal
+
+# logs
+npm-debug.log*
+
+# build
+dist/
