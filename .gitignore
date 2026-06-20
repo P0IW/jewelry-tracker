@@ -1,6 +1,19 @@
-node_modules/ 
-*.db 
-*.db-shm 
-*.db-wal 
-.env 
+# env
+.env
+
+# dependencies
+node_modules/
+
+# database
+*.db
+*.db-shm
+*.db-wal
+
+# excel archive
 *.xlsx
+
+# logs
+npm-debug.log*
+
+# build
+dist/
