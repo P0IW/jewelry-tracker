@@ -22,13 +22,8 @@ function fmtArchiveDate(iso) {
   return `${d}/${m}/${y}`;
 }
 
-// ─── Axios instance with JWT auth header ──────────────────────────────────────
+// ─── Axios instance ────────────────────────────────────────────────────────────
 const api = axios.create({ baseURL: API_URL });
-api.interceptors.request.use((cfg) => {
-  const token = localStorage.getItem("jwt");
-  if (token) cfg.headers.Authorization = `Bearer ${token}`;
-  return cfg;
-});
 
 // ─── Excel Export (daily orders) ──────────────────────────────────────────────
 function exportToExcel(orders, sessionCode) {
@@ -77,63 +72,6 @@ function Toast({ toasts, removeToast }) {
           <button onClick={() => removeToast(t.id)}>×</button>
         </div>
       ))}
-    </div>
-  );
-}
-
-// ─── Login Page ───────────────────────────────────────────────────────────────
-function LoginPage({ onLogin }) {
-  const [form, setForm] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      const res = await axios.post(`${API_URL}/auth/login`, form);
-      localStorage.setItem("jwt", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      onLogin(res.data.user);
-    } catch (err) {
-      setError(err.response?.data?.message || "خطأ في الاتصال");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="login-page">
-      <div className="login-box">
-        <div className="login-brand">
-          <span className="login-gem">💎</span>
-          <h1>تتبع الطلبات</h1>
-          <p>سجّل دخولك للمتابعة</p>
-        </div>
-        <form onSubmit={handleSubmit} className="login-form">
-          <input
-            className="login-input"
-            placeholder="اسم المستخدم"
-            value={form.username}
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
-            required
-            autoFocus
-          />
-          <input
-            className="login-input"
-            type="password"
-            placeholder="كلمة المرور"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            required
-          />
-          {error && <div className="login-error">{error}</div>}
-          <button className="login-btn" type="submit" disabled={loading}>
-            {loading ? "جاري التحقق..." : "دخول"}
-          </button>
-        </form>
-      </div>
     </div>
   );
 }
@@ -825,13 +763,6 @@ function Sidebar({
 
 // ─── Main App ────────────────────────────────────────────────────────────────
 export default function App() {
-  const [user, setUser] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("user"));
-    } catch {
-      return null;
-    }
-  });
   const [orders, setOrders] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [todaySession, setTodaySession] = useState(null);
@@ -893,18 +824,6 @@ export default function App() {
 
   const removeToast = (id) => setToasts((t) => t.filter((x) => x.id !== id));
 
-  const logout = () => {
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("user");
-    setUser(null);
-  };
-
-  // Verify token on load
-  useEffect(() => {
-    if (!user) return;
-    api.get("/auth/me").catch(() => logout());
-  }, []);
-
   const fetchSessions = useCallback(async () => {
     try {
       const [todayRes, listRes] = await Promise.all([
@@ -945,7 +864,6 @@ export default function App() {
   );
 
   useEffect(() => {
-    if (!user) return;
     fetchSessions();
     fetchOrders();
     const iv = setInterval(() => {
@@ -953,7 +871,7 @@ export default function App() {
       fetchOrders(viewingDate);
     }, 20000);
     return () => clearInterval(iv);
-  }, [user, fetchSessions, fetchOrders, viewingDate]);
+  }, [fetchSessions, fetchOrders, viewingDate]);
 
   const handleSelectDate = (isoDate) => {
     setViewingDate(isoDate === today ? null : isoDate);
@@ -1213,9 +1131,6 @@ export default function App() {
     ? sessions.find((s) => s.iso_date === viewingDate)
     : todaySession;
 
-  // ─── Not logged in ───
-  if (!user) return <LoginPage onLogin={(u) => setUser(u)} />;
-
   return (
     <div className="app">
       <Toast toasts={toasts} removeToast={removeToast} />
@@ -1340,9 +1255,6 @@ export default function App() {
               <span className="stat-lbl">جرام</span>
             </div>
           </div>
-          <button className="logout-btn" onClick={logout} title="تسجيل الخروج">
-            خروج
-          </button>
         </div>
       </header>
 

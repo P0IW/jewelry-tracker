@@ -125,95 +125,6 @@ input[type="number"] {
     text-align: right;
 }
 
-/* ─── Login ──────────────────────────────────────────────────────────────── */
-.login-page {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg);
-}
-
-.login-box {
-    background: var(--bg-card);
-    border: 1px solid var(--border-bright);
-    border-radius: var(--radius-lg);
-    padding: 2.5rem 2rem;
-    width: 320px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    animation: cardIn 0.3s ease;
-}
-
-.login-brand {
-    text-align: center;
-    margin-bottom: 1.75rem;
-}
-.login-gem {
-    font-size: 2.5rem;
-    display: block;
-    margin-bottom: 0.5rem;
-    filter: drop-shadow(0 0 8px rgba(184, 129, 58, 0.4));
-}
-.login-brand h1 {
-    font-size: 1.3rem;
-    font-weight: 800;
-    color: var(--text);
-}
-.login-brand p {
-    font-size: 0.82rem;
-    color: var(--text-3);
-    margin-top: 4px;
-}
-
-.login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.login-input {
-    background: var(--bg-3);
-    border: 1px solid var(--border-bright);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    padding: 10px 12px;
-    font-size: 0.9rem;
-    outline: none;
-    text-align: right;
-    transition: border-color 0.15s, box-shadow 0.15s;
-}
-.login-input:focus {
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px var(--gold-dim);
-}
-.login-input::placeholder { color: var(--text-3); }
-
-.login-error {
-    background: rgba(217, 79, 79, 0.1);
-    border: 1px solid rgba(217, 79, 79, 0.3);
-    color: var(--drawn);
-    border-radius: var(--radius-sm);
-    padding: 8px 12px;
-    font-size: 0.82rem;
-    text-align: center;
-}
-
-.login-btn {
-    background: var(--gold);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 11px;
-    font-size: 0.95rem;
-    font-weight: 800;
-    transition: background 0.15s, transform 0.1s;
-    box-shadow: 0 2px 10px rgba(184, 129, 58, 0.3);
-    margin-top: 0.25rem;
-}
-.login-btn:hover { background: var(--gold-light); }
-.login-btn:active { transform: scale(0.98); }
-.login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
 /* ─── App Shell ──────────────────────────────────────────────────────────── */
 .app {
     display: flex;
@@ -299,22 +210,6 @@ input[type="number"] {
     align-items: center;
     gap: 0.5rem;
     flex-shrink: 0;
-}
-
-.logout-btn {
-    background: transparent;
-    border: 1px solid var(--border-bright);
-    color: var(--text-3);
-    border-radius: var(--radius-sm);
-    padding: 5px 10px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    transition: all 0.15s;
-}
-.logout-btn:hover {
-    background: rgba(217, 79, 79, 0.08);
-    border-color: var(--drawn);
-    color: var(--drawn);
 }
 
 .main-form {
@@ -1663,8 +1558,6 @@ input[type="number"] {
     .stat-pill { padding: 2px 6px; min-width: 36px; }
     .stat-val { font-size: 0.82rem; }
     .stat-lbl { font-size: 0.55rem; }
-
-    .logout-btn { padding: 5px 8px; font-size: 0.7rem; }
 
     .readonly-banner { font-size: 0.78rem; padding: 5px 10px; }
 

@@ -4,8 +4,6 @@ dns.setDefaultResultOrder("ipv4first"); // avoid slow/hanging IPv6 lookups
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { createClient } from "@supabase/supabase-js";
 
 const app = express();
@@ -15,7 +13,6 @@ app.use(express.json({ limit: "10mb" }));
 // ─── Supabase client ──────────────────────────────────────────────────────────
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error(
@@ -23,37 +20,10 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   );
   process.exit(1);
 }
-if (!JWT_SECRET) {
-  console.error(
-    "❌ Missing JWT_SECRET in environment (.env) — set it to a long random string",
-  );
-  process.exit(1);
-}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false },
 });
-
-// ─── Auth middleware ──────────────────────────────────────────────────────────
-function requireAuth(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token)
-    return res.status(401).json({ success: false, message: "غير مصرح ❌" });
-  try {
-    req.user = jwt.verify(token, JWT_SECRET);
-    next();
-  } catch {
-    res
-      .status(401)
-      .json({ success: false, message: "انتهت الجلسة، سجّل دخولك مجددًا" });
-  }
-}
-
-function requireAdmin(req, res, next) {
-  if (!req.user?.is_admin)
-    return res.status(403).json({ success: false, message: "للمشرف فقط" });
-  next();
-}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function isoToDDMMYYYY(iso) {
@@ -189,145 +159,10 @@ async function syncOrderArchive() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════════════════════════════════════
-
-app.post("/api/auth/login", async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password)
-    return res
-      .status(400)
-      .json({ success: false, message: "أدخل اسم المستخدم وكلمة المرور" });
-
-  try {
-    const { data: user, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("username", username.trim())
-      .maybeSingle();
-    if (error) throw error;
-
-    if (!user)
-      return res
-        .status(401)
-        .json({ success: false, message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
-
-    const valid = await bcrypt.compare(password, user.password_hash);
-    if (!valid)
-      return res
-        .status(401)
-        .json({ success: false, message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
-
-    const token = jwt.sign(
-      { id: user.id, username: user.username, is_admin: user.is_admin },
-      JWT_SECRET,
-      { expiresIn: "12h" },
-    );
-
-    res.json({
-      success: true,
-      token,
-      user: { username: user.username, is_admin: user.is_admin },
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "خطأ في الخادم" });
-  }
-});
-
-app.get("/api/auth/me", requireAuth, (req, res) => {
-  res.json({ success: true, user: req.user });
-});
-
-app.get("/api/auth/users", requireAuth, requireAdmin, async (_req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from("users")
-      .select("id, username, is_admin, created_at")
-      .order("created_at");
-    if (error) throw error;
-    res.json({ success: true, data });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "خطأ في جلب المستخدمين" });
-  }
-});
-
-app.post("/api/auth/users", requireAuth, requireAdmin, async (req, res) => {
-  const { username, password, is_admin = false } = req.body;
-  if (!username || !password)
-    return res
-      .status(400)
-      .json({ success: false, message: "اسم المستخدم وكلمة المرور مطلوبان" });
-
-  try {
-    const hash = await bcrypt.hash(password, 10);
-    const { data, error } = await supabase
-      .from("users")
-      .insert({ username: username.trim(), password_hash: hash, is_admin })
-      .select("id, username, is_admin")
-      .single();
-
-    if (error) {
-      if (error.code === "23505")
-        return res
-          .status(400)
-          .json({ success: false, message: "اسم المستخدم موجود مسبقًا" });
-      throw error;
-    }
-    res.status(201).json({ success: true, data });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "خطأ في إنشاء المستخدم" });
-  }
-});
-
-app.delete("/api/auth/users/:id", requireAuth, requireAdmin, async (req, res) => {
-  const { id } = req.params;
-  if (parseInt(id, 10) === req.user.id)
-    return res
-      .status(400)
-      .json({ success: false, message: "لا يمكنك حذف حسابك الخاص" });
-  try {
-    const { error } = await supabase.from("users").delete().eq("id", id);
-    if (error) throw error;
-    res.json({ success: true });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "خطأ في الحذف" });
-  }
-});
-
-app.patch(
-  "/api/auth/users/:id/password",
-  requireAuth,
-  requireAdmin,
-  async (req, res) => {
-    const { password } = req.body;
-    if (!password)
-      return res
-        .status(400)
-        .json({ success: false, message: "كلمة المرور مطلوبة" });
-    try {
-      const hash = await bcrypt.hash(password, 10);
-      const { error } = await supabase
-        .from("users")
-        .update({ password_hash: hash })
-        .eq("id", req.params.id);
-      if (error) throw error;
-      res.json({ success: true });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ success: false, message: "خطأ في تحديث كلمة المرور" });
-    }
-  },
-);
-
-// ═══════════════════════════════════════════════════════════════════════════
 // SESSIONS
 // ═══════════════════════════════════════════════════════════════════════════
 
-app.get("/api/sessions/today", requireAuth, async (_req, res) => {
+app.get("/api/sessions/today", async (_req, res) => {
   try {
     const session = await getOrCreateSession(todayISO());
     res.json({ success: true, data: session });
@@ -337,7 +172,7 @@ app.get("/api/sessions/today", requireAuth, async (_req, res) => {
   }
 });
 
-app.get("/api/sessions", requireAuth, async (_req, res) => {
+app.get("/api/sessions", async (_req, res) => {
   try {
     const { data: sessions, error } = await supabase
       .from("sessions")
@@ -370,7 +205,7 @@ app.get("/api/sessions", requireAuth, async (_req, res) => {
 });
 
 /** DELETE /api/sessions/:id — delete a past session, its orders, and its archive entries */
-app.delete("/api/sessions/:id", requireAuth, async (req, res) => {
+app.delete("/api/sessions/:id", async (req, res) => {
   try {
     const { data: session, error: getErr } = await supabase
       .from("sessions")
@@ -415,7 +250,7 @@ app.delete("/api/sessions/:id", requireAuth, async (req, res) => {
 // ORDERS
 // ═══════════════════════════════════════════════════════════════════════════
 
-app.post("/api/orders", requireAuth, async (req, res) => {
+app.post("/api/orders", async (req, res) => {
   const { clientName, designName, code, weight, creator } = req.body;
   if (!clientName)
     return res
@@ -450,7 +285,7 @@ app.post("/api/orders", requireAuth, async (req, res) => {
   }
 });
 
-app.get("/api/orders", requireAuth, async (req, res) => {
+app.get("/api/orders", async (req, res) => {
   try {
     const targetDate = req.query.date || todayISO();
     const { data: orders, error } = await supabase
@@ -467,7 +302,7 @@ app.get("/api/orders", requireAuth, async (req, res) => {
 });
 
 /** PATCH /api/orders/:id/status — toggle boolean fields */
-app.patch("/api/orders/:id/status", requireAuth, async (req, res) => {
+app.patch("/api/orders/:id/status", async (req, res) => {
   const { id } = req.params;
   const ALLOWED = ["is_drawn", "is_weighed", "is_cut_sent"];
   const updates = Object.fromEntries(
@@ -495,7 +330,7 @@ app.patch("/api/orders/:id/status", requireAuth, async (req, res) => {
 });
 
 /** PATCH /api/orders/:id/archive — add/remove this order from the archive */
-app.patch("/api/orders/:id/archive", requireAuth, async (req, res) => {
+app.patch("/api/orders/:id/archive", async (req, res) => {
   const { id } = req.params;
   const archived = req.body.archived ? 1 : 0;
   try {
@@ -566,7 +401,7 @@ app.patch("/api/orders/:id/archive", requireAuth, async (req, res) => {
 });
 
 /** PATCH /api/orders/:id/edit — edit order content fields (incl. creator) */
-app.patch("/api/orders/:id/edit", requireAuth, async (req, res) => {
+app.patch("/api/orders/:id/edit", async (req, res) => {
   const { id } = req.params;
   const { design, code, weight, client_name, creator } = req.body;
 
@@ -643,7 +478,7 @@ app.patch("/api/orders/:id/edit", requireAuth, async (req, res) => {
   }
 });
 
-app.delete("/api/orders/:id", requireAuth, async (req, res) => {
+app.delete("/api/orders/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const { data: exists, error: getErr } = await supabase
@@ -674,7 +509,7 @@ app.delete("/api/orders/:id", requireAuth, async (req, res) => {
 // ARCHIVE
 // ═══════════════════════════════════════════════════════════════════════════
 
-app.get("/api/archive/search", requireAuth, async (req, res) => {
+app.get("/api/archive/search", async (req, res) => {
   const q = (req.query.q || "").trim();
   if (!q) return res.json({ success: true, mode: "empty", data: [] });
   try {
@@ -720,7 +555,7 @@ app.get("/api/archive/search", requireAuth, async (req, res) => {
   }
 });
 
-app.get("/api/archive/all", requireAuth, async (req, res) => {
+app.get("/api/archive/all", async (req, res) => {
   const q = (req.query.q || "").trim();
   const fetchAll = req.query.all === "1";
   const limit = Math.min(parseInt(req.query.limit, 10) || 100, 1000);
@@ -759,8 +594,6 @@ app.get("/api/archive/all", requireAuth, async (req, res) => {
 
 app.post(
   "/api/archive/import",
-  requireAuth,
-  requireAdmin,
   async (req, res) => {
     const rows = req.body?.rows;
     if (!Array.isArray(rows))
@@ -799,7 +632,7 @@ app.post(
   },
 );
 
-app.get("/api/archive/count", requireAuth, async (_req, res) => {
+app.get("/api/archive/count", async (_req, res) => {
   try {
     const { count, error } = await supabase
       .from("archive")
