@@ -5,7 +5,6 @@ import "./App.css";
 
 const API_URL = "https://jewelry-tracker-dq0w.onrender.com/api";
 
-<<<<<<< HEAD
 // ─── العاصمة clients ──────────────────────────────────────────────────────────
 const CAPITAL_CLIENTS = [
   "فتوح", "بن علي فوت لوفر", "بن علي", "سعيد",
@@ -23,9 +22,7 @@ function fmtArchiveDate(iso) {
   return `${d}/${m}/${y}`;
 }
 
-// ─── Excel Export (daily orders) ──────────────────────────────────────────────
-=======
-// ─── Axios auth interceptor ───────────────────────────────────────────────────
+// ─── Axios instance with JWT auth header ──────────────────────────────────────
 const api = axios.create({ baseURL: API_URL });
 api.interceptors.request.use((cfg) => {
   const token = localStorage.getItem("jwt");
@@ -33,19 +30,14 @@ api.interceptors.request.use((cfg) => {
   return cfg;
 });
 
-// ─── Export ───────────────────────────────────────────────────────────────────
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
+// ─── Excel Export (daily orders) ──────────────────────────────────────────────
 function exportToExcel(orders, sessionCode) {
   if (!orders.length) return false;
   const rows = [["اسم الطلب", "كود الملف"]];
   orders.forEach((o) => rows.push([`${o.design}${o.code}`, sessionCode]));
   const csv = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\r\n");
-<<<<<<< HEAD
   const bom = "\uFEFF";
   const blob = new Blob([bom + csv], { type: "text/csv;charset=utf-8;" });
-=======
-  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -89,9 +81,6 @@ function Toast({ toasts, removeToast }) {
   );
 }
 
-<<<<<<< HEAD
-// ─── Confirm Modal ───────────────────────────────────────────────────────────
-=======
 // ─── Login Page ───────────────────────────────────────────────────────────────
 function LoginPage({ onLogin }) {
   const [form, setForm] = useState({ username: "", password: "" });
@@ -149,8 +138,7 @@ function LoginPage({ onLogin }) {
   );
 }
 
-// ─── Confirm Modal ────────────────────────────────────────────────────────────
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
+// ─── Confirm Modal ───────────────────────────────────────────────────────────
 function ConfirmModal({ item, onConfirm, onCancel }) {
   if (!item) return null;
   return (
@@ -170,7 +158,6 @@ function ConfirmModal({ item, onConfirm, onCancel }) {
   );
 }
 
-<<<<<<< HEAD
 // ─── Edit Modal ──────────────────────────────────────────────────────────────
 function EditModal({ item, onSave, onCancel }) {
   const [form, setForm] = useState({
@@ -178,6 +165,7 @@ function EditModal({ item, onSave, onCancel }) {
     code: item?.code || "",
     weight: item?.weight || "",
     client_name: item?.client_name || "",
+    creator: item?.creator || "مارو",
   });
 
   if (!item) return null;
@@ -218,82 +206,25 @@ function EditModal({ item, onSave, onCancel }) {
             onChange={(e) => setForm({ ...form, weight: e.target.value })}
             placeholder="الوزن"
           />
-=======
-// ─── Edit Modal ───────────────────────────────────────────────────────────────
-function EditModal({ order, onSave, onCancel }) {
-  const [form, setForm] = useState({
-    clientName: order.client_name,
-    designName: order.design,
-    code: order.code,
-    weight: order.weight || "",
-    creator: order.creator,
-  });
-
-  return (
-    <div className="modal-backdrop" onClick={onCancel}>
-      <div
-        className="modal-box edit-modal"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 className="edit-title">تعديل الطلب</h3>
-        <div className="edit-fields">
-          <label>
-            اسم العميل
-            <input
-              value={form.clientName}
-              onChange={(e) => setForm({ ...form, clientName: e.target.value })}
-            />
-          </label>
-          <label>
-            التصميم
-            <input
-              value={form.designName}
-              onChange={(e) => setForm({ ...form, designName: e.target.value })}
-            />
-          </label>
-          <label>
-            الكود
-            <input
-              value={form.code}
-              onChange={(e) => setForm({ ...form, code: e.target.value })}
-            />
-          </label>
-          <label>
-            الوزن (غ)
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={form.weight}
-              onChange={(e) => setForm({ ...form, weight: e.target.value })}
-            />
-          </label>
-          <label>
-            المنفّذ
-            <select
-              value={form.creator}
-              onChange={(e) => setForm({ ...form, creator: e.target.value })}
-            >
-              <option value="مارو">مارو</option>
-              <option value="محمد">محمد</option>
-            </select>
-          </label>
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
+          <label className="edit-label">المنفّذ</label>
+          <select
+            className="edit-input"
+            value={form.creator}
+            onChange={(e) => setForm({ ...form, creator: e.target.value })}
+          >
+            <option value="مارو">مارو</option>
+            <option value="محمد">محمد</option>
+          </select>
         </div>
         <div className="modal-actions">
           <button className="btn-cancel" onClick={onCancel}>
             إلغاء
           </button>
-<<<<<<< HEAD
           <button
             className="btn-save-confirm"
             onClick={() => onSave(item.id, form)}
           >
             حفظ
-=======
-          <button className="mf-btn" onClick={() => onSave(form)}>
-            حفظ التعديل
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
           </button>
         </div>
       </div>
@@ -301,10 +232,49 @@ function EditModal({ order, onSave, onCancel }) {
   );
 }
 
-<<<<<<< HEAD
+// ─── Generic Floating Context Menu (portal at root) ───────────────────────────
+function CtxMenu({ x, y, items, onClose }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const close = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) onClose();
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("scroll", close, true);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("scroll", close, true);
+    };
+  }, [onClose]);
+
+  return ReactDOM.createPortal(
+    <div
+      ref={ref}
+      className="ctx-menu"
+      style={{ top: y, left: x }}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
+      {items.map((it, i) => (
+        <button
+          key={i}
+          className={`ctx-item ${it.danger ? "ctx-delete" : ""}`}
+          onClick={() => {
+            onClose();
+            it.action();
+          }}
+        >
+          {it.label}
+        </button>
+      ))}
+    </div>,
+    document.body
+  );
+}
+
 // ─── Order Row ───────────────────────────────────────────────────────────────
-function OrderRow({ o, onToggle, onArchive, onDelete, onEdit, onMenu, readOnly }) {
+function OrderRow({ o, onToggle, onArchive, onMenu, readOnly }) {
   const isCutSent = !!o.is_cut_sent;
+  const isMohamed = o.creator === "محمد";
 
   const openMenu = (e) => {
     if (readOnly) return;
@@ -326,64 +296,23 @@ function OrderRow({ o, onToggle, onArchive, onDelete, onEdit, onMenu, readOnly }
       `}
       onClick={openMenu}
       onContextMenu={openMenu}
-=======
-// ─── Context Menu (generic) ───────────────────────────────────────────────────
-function CtxMenu({ x, y, items, onClose }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    const close = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) onClose();
-    };
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
-  }, [onClose]);
-
-  return (
-    <div
-      ref={ref}
-      className="ctx-menu"
-      style={{ top: y, left: x }}
-      onMouseLeave={onClose}
-    >
-      {items.map((item, i) => (
-        <button
-          key={i}
-          className={`ctx-item ${item.danger ? "ctx-delete" : ""}`}
-          onClick={() => {
-            onClose();
-            item.action();
-          }}
-        >
-          {item.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ─── Order Row ────────────────────────────────────────────────────────────────
-function OrderRow({ o, onToggle, onDelete, onEdit, readOnly }) {
-  const [menu, setMenu] = useState(null);
-
-  return (
-    <div
-      className={`order-item ${o.is_laser ? "laser-bg" : ""} ${o.is_drawn ? "drawn-bg" : ""}`}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        setMenu({ x: e.clientX, y: e.clientY });
-      }}
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
     >
       {isCutSent && <div className="cut-sent-line" />}
       <span className="order-code">#{o.code}</span>
       <span className="order-name">
         {o.design || <em className="empty-field">—</em>}
       </span>
+      {o.creator && (
+        <span className={`order-creator ${isMohamed ? "creator-m" : "creator-k"}`}>
+          {o.creator}
+        </span>
+      )}
       <span className="order-weight">
         {parseFloat(o.weight || 0).toFixed(1)}غ
       </span>
       <div className="status-btns">
         <button
+          title="رسم"
           className={`s-btn ${o.is_drawn ? "active-drawn" : ""}`}
           onClick={(e) => { e.stopPropagation(); !readOnly && onToggle(o.id, "is_drawn", o.is_drawn); }}
           style={readOnly ? { opacity: 0.5, cursor: "default" } : {}}
@@ -391,14 +320,9 @@ function OrderRow({ o, onToggle, onDelete, onEdit, readOnly }) {
           ●
         </button>
         <button
-<<<<<<< HEAD
           title="تم حساب الوزن"
           className={`s-btn ${o.is_weighed ? "active-weighed" : ""}`}
           onClick={(e) => { e.stopPropagation(); !readOnly && onToggle(o.id, "is_weighed", o.is_weighed); }}
-=======
-          className={`s-btn ${o.is_laser ? "active-laser" : ""}`}
-          onClick={() => !readOnly && onToggle(o.id, "is_laser", o.is_laser)}
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
           style={readOnly ? { opacity: 0.5, cursor: "default" } : {}}
         >
           ⚖
@@ -420,54 +344,7 @@ function OrderRow({ o, onToggle, onDelete, onEdit, readOnly }) {
           🗄
         </button>
       </div>
-<<<<<<< HEAD
-=======
-
-      {menu && (
-        <CtxMenu
-          x={menu.x}
-          y={menu.y}
-          onClose={() => setMenu(null)}
-          items={[
-            { label: "✏️ تعديل الطلب", action: () => onEdit(o) },
-            { label: "🗑 حذف الطلب", danger: true, action: () => onDelete(o) },
-          ]}
-        />
-      )}
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
     </div>
-  );
-}
-
-// ─── Floating Context Menu (portal at root) ───────────────────────────────────
-function CtxMenu({ menu, onEdit, onDelete, onClose }) {
-  useEffect(() => {
-    if (!menu) return;
-    const close = () => onClose();
-    document.addEventListener("mousedown", close);
-    document.addEventListener("scroll", close, true);
-    return () => {
-      document.removeEventListener("mousedown", close);
-      document.removeEventListener("scroll", close, true);
-    };
-  }, [menu, onClose]);
-
-  if (!menu) return null;
-
-  return ReactDOM.createPortal(
-    <div
-      className="ctx-menu"
-      style={{ top: menu.y, left: menu.x }}
-      onMouseDown={(e) => e.stopPropagation()}
-    >
-      <button className="ctx-edit" onClick={() => { onEdit(menu.order); onClose(); }}>
-        ✏️ تعديل الطلب
-      </button>
-      <button className="ctx-delete" onClick={() => { onDelete(menu.order); onClose(); }}>
-        🗑 حذف الطلب
-      </button>
-    </div>,
-    document.body
   );
 }
 
@@ -480,12 +357,7 @@ function ClientCard({
   onSubmit,
   onToggle,
   onArchive,
-  onDelete,
-  onEdit,
-<<<<<<< HEAD
   onMenu,
-=======
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
   readOnly,
   isCapital,
   filterRegion,
@@ -581,6 +453,19 @@ function ClientCard({
               }))
             }
           />
+          <select
+            className="qa-creator"
+            value={qf.creator || "مارو"}
+            onChange={(e) =>
+              setQuickForm((p) => ({
+                ...p,
+                [client]: { ...qf, creator: e.target.value },
+              }))
+            }
+          >
+            <option value="مارو">مارو</option>
+            <option value="محمد">محمد</option>
+          </select>
           <button type="submit" className="qa-btn">
             +
           </button>
@@ -594,12 +479,7 @@ function ClientCard({
             o={o}
             onToggle={onToggle}
             onArchive={onArchive}
-            onDelete={onDelete}
-            onEdit={onEdit}
-<<<<<<< HEAD
             onMenu={onMenu}
-=======
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
             readOnly={readOnly}
           />
         ))}
@@ -634,7 +514,7 @@ function ArchiveSearch() {
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API_URL}/archive/search`, {
+        const res = await api.get("/archive/search", {
           params: { q: query.trim() },
         });
         setResults(
@@ -750,8 +630,8 @@ function ArchiveModal({ onClose, addToast }) {
 
   const load = useCallback(
     (q, offset) =>
-      axios
-        .get(`${API_URL}/archive/all`, { params: { q: q.trim(), limit: PAGE, offset } })
+      api
+        .get("/archive/all", { params: { q: q.trim(), limit: PAGE, offset } })
         .then((r) => r.data),
     []
   );
@@ -797,7 +677,7 @@ function ArchiveModal({ onClose, addToast }) {
   const handleExportAll = async () => {
     setExporting(true);
     try {
-      const res = await axios.get(`${API_URL}/archive/all`, {
+      const res = await api.get("/archive/all", {
         params: { q: query.trim(), all: 1 },
       });
       if (res.data.success && res.data.data.length) {
@@ -886,16 +766,13 @@ function Sidebar({
   viewingDate,
   onSelectDate,
   onExport,
-  onDeleteSession,
-  orders,
+  onSessionMenu,
   isOpen,
   onClose,
 }) {
   const today = new Date().toLocaleDateString("sv-SE");
-  const [sessionMenu, setSessionMenu] = useState(null); // { x, y, session }
 
   return (
-<<<<<<< HEAD
     <>
       {isOpen && <div className="sidebar-overlay" onClick={onClose} />}
       <aside className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
@@ -909,15 +786,14 @@ function Sidebar({
               </span>
             )}
           </div>
-          <button className="export-btn" onClick={onExport} title="تصدير Excel">
+          <button className="export-btn" onClick={() => onExport()} title="تصدير Excel">
             ⬇ تصدير Excel
           </button>
         </div>
         <div className="sidebar-history-label">السجل — 30 يوم</div>
         <div className="sidebar-list">
           {sessions.map((s) => {
-            const isActive =
-              viewingDate === s.iso_date || (isToday && s.iso_date === today);
+            const isActive = viewingDate === s.iso_date;
             return (
               <button
                 key={s.id}
@@ -926,10 +802,14 @@ function Sidebar({
                   onSelectDate(s.iso_date);
                   onClose();
                 }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  if (s.iso_date !== today) onSessionMenu(e.clientX, e.clientY, s);
+                }}
               >
                 <span className="si-code">{s.session_code}</span>
                 <span className="si-meta">
-                  {s.order_count} طلب · {parseFloat(s.total_weight).toFixed(1)}غ
+                  {s.order_count} طلب · {parseFloat(s.total_weight || 0).toFixed(1)}غ
                 </span>
               </button>
             );
@@ -944,156 +824,6 @@ function Sidebar({
 }
 
 // ─── Main App ────────────────────────────────────────────────────────────────
-=======
-    <aside className="sidebar">
-      <div className="sidebar-today">
-        <div className="sidebar-today-label">
-          ملف اليوم
-          {todaySession && (
-            <span className="sidebar-today-code">
-              {" "}
-              — {todaySession.session_code}
-            </span>
-          )}
-        </div>
-        <button className="export-btn" onClick={onExport}>
-          ⬇ تصدير Excel
-        </button>
-      </div>
-
-      <div className="sidebar-history-label">السجل — 30 يوم</div>
-      <div className="sidebar-list">
-        {sessions.map((s) => {
-          const isActive = viewingDate === s.iso_date;
-          return (
-            <button
-              key={s.id}
-              className={`sidebar-item ${isActive ? "sidebar-item-active" : ""}`}
-              onClick={() => onSelectDate(s.iso_date)}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                if (s.iso_date !== today)
-                  setSessionMenu({ x: e.clientX, y: e.clientY, session: s });
-              }}
-            >
-              <span className="si-code">{s.session_code}</span>
-              <span className="si-meta">
-                {s.order_count} طلب ·{" "}
-                {parseFloat(s.total_weight || 0).toFixed(1)}غ
-              </span>
-            </button>
-          );
-        })}
-        {sessions.length === 0 && (
-          <div className="sidebar-empty">لا توجد سجلات</div>
-        )}
-      </div>
-
-      {sessionMenu && (
-        <CtxMenu
-          x={sessionMenu.x}
-          y={sessionMenu.y}
-          onClose={() => setSessionMenu(null)}
-          items={[
-            {
-              label: "⬇ تصدير Excel",
-              action: () => onExport(sessionMenu.session),
-            },
-            {
-              label: "🗑 حذف الملف",
-              danger: true,
-              action: () => onDeleteSession(sessionMenu.session),
-            },
-          ]}
-        />
-      )}
-    </aside>
-  );
-}
-
-// ─── Top Scroll Bar ───────────────────────────────────────────────────────────
-function TopScrollBar({ scrollRef }) {
-  const trackRef = useRef(null);
-  const [thumb, setThumb] = useState({ width: 0, left: 0, visible: false });
-  const dragging = useRef(false);
-  const dragStart = useRef(0);
-  const scrollStart = useRef(0);
-
-  const update = useCallback(() => {
-    const el = scrollRef.current;
-    const track = trackRef.current;
-    if (!el || !track) return;
-    const ratio = el.clientWidth / el.scrollWidth;
-    if (ratio >= 1) {
-      setThumb((t) => ({ ...t, visible: false }));
-      return;
-    }
-    const thumbW = Math.max(ratio * track.clientWidth, 40);
-    const maxScroll = el.scrollWidth - el.clientWidth;
-    const maxLeft = track.clientWidth - thumbW;
-    const left = (el.scrollLeft / maxScroll) * maxLeft;
-    setThumb({ width: thumbW, left, visible: true });
-  }, [scrollRef]);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const obs = new ResizeObserver(update);
-    obs.observe(el);
-    el.addEventListener("scroll", update);
-    update();
-    return () => {
-      obs.disconnect();
-      el.removeEventListener("scroll", update);
-    };
-  }, [update, scrollRef]);
-
-  const onMouseDown = (e) => {
-    dragging.current = true;
-    dragStart.current = e.clientX;
-    scrollStart.current = scrollRef.current.scrollLeft;
-    e.preventDefault();
-  };
-
-  useEffect(() => {
-    const onMove = (e) => {
-      if (!dragging.current) return;
-      const el = scrollRef.current;
-      const track = trackRef.current;
-      if (!el || !track) return;
-      const ratio = el.scrollWidth / track.clientWidth;
-      el.scrollLeft =
-        scrollStart.current + (e.clientX - dragStart.current) * ratio;
-    };
-    const onUp = () => {
-      dragging.current = false;
-    };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, [scrollRef]);
-
-  if (!thumb.visible) return null;
-
-  return (
-    <div ref={trackRef} className="top-scrollbar-track">
-      <div
-        className="top-scrollbar-thumb"
-        style={{
-          width: thumb.width,
-          transform: `translateX(${-thumb.left}px)`,
-        }}
-        onMouseDown={onMouseDown}
-      />
-    </div>
-  );
-}
-
-// ─── Main App ─────────────────────────────────────────────────────────────────
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
 export default function App() {
   const [user, setUser] = useState(() => {
     try {
@@ -1109,12 +839,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState([]);
   const [confirmItem, setConfirmItem] = useState(null);
-<<<<<<< HEAD
-  const [editItem, setEditItem] = useState(null);
-  const [ctxMenu, setCtxMenu] = useState(null);
-=======
   const [editOrder, setEditOrder] = useState(null);
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
+  const [ctxMenu, setCtxMenu] = useState(null); // { x, y, items }
   const [search, setSearch] = useState("");
   const [filterRegion, setFilterRegion] = useState("الكل");
 
@@ -1154,11 +880,6 @@ export default function App() {
     weight: "",
   });
   const [quickForm, setQuickForm] = useState({});
-<<<<<<< HEAD
-=======
-  const toastId = useRef(0);
-  const cardsScrollRef = useRef(null);
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
 
   const toastId = useRef(0);
   const today = new Date().toLocaleDateString("sv-SE");
@@ -1172,8 +893,6 @@ export default function App() {
 
   const removeToast = (id) => setToasts((t) => t.filter((x) => x.id !== id));
 
-<<<<<<< HEAD
-=======
   const logout = () => {
     localStorage.removeItem("jwt");
     localStorage.removeItem("user");
@@ -1185,7 +904,6 @@ export default function App() {
     if (!user) return;
     api.get("/auth/me").catch(() => logout());
   }, []);
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
 
   const fetchSessions = useCallback(async () => {
     try {
@@ -1204,10 +922,7 @@ export default function App() {
     async (date = null) => {
       try {
         const targetDate = date || today;
-<<<<<<< HEAD
-        const res = await axios.get(`${API_URL}/orders`, {
-          params: { date: targetDate },
-        });
+        const res = await api.get("/orders", { params: { date: targetDate } });
         if (res.data.success) {
           setOrders(res.data.data);
           // Preserve existing column order, only add new clients at the end
@@ -1220,10 +935,6 @@ export default function App() {
             return [...existing, ...newClients];
           });
         }
-=======
-        const res = await api.get("/orders", { params: { date: targetDate } });
-        if (res.data.success) setOrders(res.data.data);
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
       } catch {
         addToast("تعذّر الاتصال بالخادم", "error");
       } finally {
@@ -1245,8 +956,7 @@ export default function App() {
   }, [user, fetchSessions, fetchOrders, viewingDate]);
 
   const handleSelectDate = (isoDate) => {
-    const newDate = isoDate === today ? null : isoDate;
-    setViewingDate(newDate);
+    setViewingDate(isoDate === today ? null : isoDate);
     setSearch("");
     setColumnOrder([]); // reset order when switching days
     fetchOrders(isoDate);
@@ -1255,19 +965,8 @@ export default function App() {
   const handleMainSubmit = async (e) => {
     e.preventDefault();
     try {
-<<<<<<< HEAD
-      await axios.post(`${API_URL}/orders`, mainForm);
-      setMainForm({ clientName: "", designName: "", code: "", weight: "" });
-=======
       await api.post("/orders", mainForm);
-      setMainForm({
-        clientName: "",
-        designName: "",
-        code: "",
-        weight: "",
-        creator: "مارو",
-      });
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
+      setMainForm({ clientName: "", designName: "", code: "", weight: "" });
       await fetchOrders(today);
       await fetchSessions();
       addToast("✅ تم إضافة الطلب");
@@ -1285,6 +984,7 @@ export default function App() {
         designName: qf.designName,
         code: qf.code,
         weight: qf.weight,
+        creator: qf.creator || "مارو",
       });
       setQuickForm((p) => ({ ...p, [client]: {} }));
       await fetchOrders(today);
@@ -1297,13 +997,9 @@ export default function App() {
 
   const toggleStatus = async (id, field, val) => {
     try {
-<<<<<<< HEAD
-      await axios.patch(`${API_URL}/orders/${id}/status`, {
+      await api.patch(`/orders/${id}/status`, {
         [field]: val === 0 || val === false || !val ? 1 : 0,
       });
-=======
-      await api.patch(`/orders/${id}/status`, { [field]: val === 0 ? 1 : 0 });
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
       setOrders((prev) =>
         prev.map((o) =>
           o.id === id
@@ -1316,7 +1012,6 @@ export default function App() {
     }
   };
 
-<<<<<<< HEAD
   const toggleArchive = async (order) => {
     const newVal = order.is_archived ? 0 : 1;
     // تحديث فوري للواجهة
@@ -1324,7 +1019,7 @@ export default function App() {
       prev.map((o) => (o.id === order.id ? { ...o, is_archived: newVal } : o))
     );
     try {
-      await axios.patch(`${API_URL}/orders/${order.id}/archive`, { archived: newVal });
+      await api.patch(`/orders/${order.id}/archive`, { archived: newVal });
       addToast(newVal ? "🗄 أُضيف إلى الأرشيف" : "↩️ أُزيل من الأرشيف");
     } catch {
       // تراجع عند الفشل
@@ -1334,24 +1029,6 @@ export default function App() {
         )
       );
       addToast("❌ خطأ في الأرشفة", "error");
-    }
-  };
-
-  const deleteOrder = async () => {
-    if (!confirmItem) return;
-=======
-  const handleSaveEdit = async (form) => {
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
-    try {
-      const { data } = await api.patch(`/orders/${editOrder.id}`, form);
-      setOrders((prev) =>
-        prev.map((o) => (o.id === editOrder.id ? data.data : o)),
-      );
-      setEditOrder(null);
-      await fetchSessions();
-      addToast("✅ تم التعديل");
-    } catch {
-      addToast("❌ خطأ في التعديل", "error");
     }
   };
 
@@ -1369,36 +1046,6 @@ export default function App() {
     }
   };
 
-<<<<<<< HEAD
-  const handleEditSave = async (id, form) => {
-    try {
-      await axios.patch(`${API_URL}/orders/${id}/edit`, form);
-      setOrders((prev) =>
-        prev.map((o) =>
-          o.id === id
-            ? {
-                ...o,
-                design: form.design,
-                code: form.code,
-                weight: parseFloat(form.weight) || 0,
-                client_name: form.client_name,
-              }
-            : o
-        )
-      );
-      await fetchSessions();
-      addToast("✅ تم التعديل");
-    } catch {
-      addToast("❌ خطأ في التعديل", "error");
-    } finally {
-      setEditItem(null);
-    }
-  };
-
-  const handleExport = () => {
-    const sessionForExport = viewingDate
-      ? sessions.find((s) => s.iso_date === viewingDate)
-=======
   const deleteSession = async () => {
     if (!confirmItem?.sessionId) return;
     try {
@@ -1416,8 +1063,34 @@ export default function App() {
     }
   };
 
+  const handleEditSave = async (id, form) => {
+    try {
+      await api.patch(`/orders/${id}/edit`, form);
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === id
+            ? {
+                ...o,
+                design: form.design,
+                code: form.code,
+                weight: parseFloat(form.weight) || 0,
+                client_name: form.client_name,
+                creator: form.creator,
+              }
+            : o
+        )
+      );
+      await fetchSessions();
+      addToast("✅ تم التعديل");
+    } catch {
+      addToast("❌ خطأ في التعديل", "error");
+    } finally {
+      setEditOrder(null);
+    }
+  };
+
   const handleExport = async (session = null) => {
-    // If session passed = exporting a specific past session, fetch its orders
+    // Exporting a specific past session (from the sidebar context menu)
     if (session) {
       try {
         const res = await api.get("/orders", {
@@ -1433,16 +1106,52 @@ export default function App() {
       return;
     }
     // Export current view
-    const s = viewingDate
-      ? sessions.find((x) => x.iso_date === viewingDate)
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
+    const sessionForExport = viewingDate
+      ? sessions.find((s) => s.iso_date === viewingDate)
       : todaySession;
-    if (!s) {
+    if (!sessionForExport) {
       addToast("لا يوجد ملف للتصدير", "error");
       return;
     }
-    const ok = exportToExcel(orders, s.session_code);
+    const ok = exportToExcel(orders, sessionForExport.session_code);
     ok ? addToast("✅ تم التصدير") : addToast("لا توجد طلبات للتصدير", "error");
+  };
+
+  // ─── Order context menu (right-click / click on an order row) ───
+  const handleOrderMenu = ({ x, y, order }) => {
+    setCtxMenu({
+      x,
+      y,
+      items: [
+        { label: "✏️ تعديل الطلب", action: () => setEditOrder(order) },
+        {
+          label: "🗑 حذف الطلب",
+          danger: true,
+          action: () => setConfirmItem(order),
+        },
+      ],
+    });
+  };
+
+  // ─── Session context menu (right-click on a past session in sidebar) ───
+  const handleSessionMenu = (x, y, session) => {
+    setCtxMenu({
+      x,
+      y,
+      items: [
+        { label: "⬇ تصدير Excel", action: () => handleExport(session) },
+        {
+          label: "🗑 حذف الملف",
+          danger: true,
+          action: () =>
+            setConfirmItem({
+              sessionId: session.id,
+              isoDate: session.iso_date,
+              message: `حذف ملف ${session.session_code} وجميع طلباته؟`,
+            }),
+        },
+      ],
+    });
   };
 
   // ─── Drag handlers ───
@@ -1476,7 +1185,6 @@ export default function App() {
     const matchSearch =
       !search ||
       o.client_name.includes(search) ||
-<<<<<<< HEAD
       o.design.includes(search) ||
       o.code.includes(search);
     const matchRegion =
@@ -1484,13 +1192,6 @@ export default function App() {
       (filterRegion === "العاصمة" && isCapitalClient(o.client_name)) ||
       (filterRegion === "سطيف" && !isCapitalClient(o.client_name));
     return matchSearch && matchRegion;
-=======
-      o.design?.includes(search) ||
-      o.code?.includes(search);
-    const matchCreator =
-      filterCreator === "الكل" || o.creator === filterCreator;
-    return matchSearch && matchCreator;
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
   });
 
   const grouped = filtered.reduce((acc, o) => {
@@ -1507,10 +1208,7 @@ export default function App() {
 
   const totalWeight = orders.reduce((s, o) => s + parseFloat(o.weight || 0), 0);
   const drawnTotal = orders.filter((o) => o.is_drawn).length;
-<<<<<<< HEAD
 
-=======
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
   const viewingSession = viewingDate
     ? sessions.find((s) => s.iso_date === viewingDate)
     : todaySession;
@@ -1521,33 +1219,23 @@ export default function App() {
   return (
     <div className="app">
       <Toast toasts={toasts} removeToast={removeToast} />
-<<<<<<< HEAD
-      <CtxMenu
-        menu={ctxMenu}
-        onEdit={setEditItem}
-        onDelete={setConfirmItem}
-        onClose={() => setCtxMenu(null)}
-      />
-=======
-
-      {editOrder && (
-        <EditModal
-          order={editOrder}
-          onSave={handleSaveEdit}
-          onCancel={() => setEditOrder(null)}
+      {ctxMenu && (
+        <CtxMenu
+          x={ctxMenu.x}
+          y={ctxMenu.y}
+          items={ctxMenu.items}
+          onClose={() => setCtxMenu(null)}
         />
       )}
-
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
       <ConfirmModal
         item={confirmItem}
         onConfirm={confirmItem?.sessionId ? deleteSession : deleteOrder}
         onCancel={() => setConfirmItem(null)}
       />
       <EditModal
-        item={editItem}
+        item={editOrder}
         onSave={handleEditSave}
-        onCancel={() => setEditItem(null)}
+        onCancel={() => setEditOrder(null)}
       />
       {archiveOpen && (
         <ArchiveModal
@@ -1587,11 +1275,7 @@ export default function App() {
           </div>
         </div>
 
-<<<<<<< HEAD
         {!isReadOnly && (
-=======
-        {!isReadOnly ? (
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
           <form className="main-form" onSubmit={handleMainSubmit}>
             <input
               className="mf-input"
@@ -1633,41 +1317,19 @@ export default function App() {
               + إضافة
             </button>
           </form>
-<<<<<<< HEAD
         )}
 
         {isReadOnly && (
-=======
-        ) : (
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
           <div className="readonly-banner">
             👁 عرض: {viewingSession?.session_code} — للقراءة فقط
           </div>
         )}
 
-<<<<<<< HEAD
-        <div className="stats-row">
-          <div className="stat-pill">
-            <span className="stat-val">{orders.length}</span>
-            <span className="stat-lbl">طلب</span>
-          </div>
-          <div className="stat-pill stat-drawn">
-            <span className="stat-val">●{drawnTotal}</span>
-            <span className="stat-lbl">رسم</span>
-          </div>
-          <div className="stat-pill stat-weight">
-            <span className="stat-val">{totalWeight.toFixed(1)}</span>
-            <span className="stat-lbl">جرام</span>
-=======
         <div className="header-end">
           <div className="stats-row">
             <div className="stat-pill">
               <span className="stat-val">{orders.length}</span>
               <span className="stat-lbl">طلب</span>
-            </div>
-            <div className="stat-pill stat-laser">
-              <span className="stat-val">⚡{laserTotal}</span>
-              <span className="stat-lbl">ليزر</span>
             </div>
             <div className="stat-pill stat-drawn">
               <span className="stat-val">●{drawnTotal}</span>
@@ -1677,7 +1339,6 @@ export default function App() {
               <span className="stat-val">{totalWeight.toFixed(1)}</span>
               <span className="stat-lbl">جرام</span>
             </div>
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
           </div>
           <button className="logout-btn" onClick={logout} title="تسجيل الخروج">
             خروج
@@ -1685,7 +1346,6 @@ export default function App() {
         </div>
       </header>
 
-<<<<<<< HEAD
       {/* Mobile Add Form */}
       {!isReadOnly && (
         <div className="mobile-add-bar">
@@ -1737,8 +1397,6 @@ export default function App() {
         </div>
       )}
 
-=======
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
       {/* ── BODY ── */}
       <div className="body-row">
         <Sidebar
@@ -1747,21 +1405,10 @@ export default function App() {
           viewingDate={viewingDate || today}
           onSelectDate={handleSelectDate}
           onExport={handleExport}
-          onDeleteSession={(s) =>
-            setConfirmItem({
-              sessionId: s.id,
-              isoDate: s.iso_date,
-              message: `حذف ملف ${s.session_code} وجميع طلباته؟`,
-            })
-          }
-          orders={orders}
+          onSessionMenu={handleSessionMenu}
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
-<<<<<<< HEAD
-=======
-
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
         <div className="main-content">
           <div className="toolbar">
             <input
@@ -1793,15 +1440,7 @@ export default function App() {
               {orderedClients.length} عميل
             </span>
           </div>
-<<<<<<< HEAD
           <div className="cards-scroll">
-=======
-
-          {/* Top scroll indicator */}
-          <TopScrollBar scrollRef={cardsScrollRef} />
-
-          <div className="cards-scroll" ref={cardsScrollRef}>
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
             {loading ? (
               <div className="loading-state">
                 <div className="spinner" />
@@ -1813,7 +1452,6 @@ export default function App() {
                 <p>{search ? "لا نتائج مطابقة" : "لا توجد طلبات"}</p>
               </div>
             ) : (
-<<<<<<< HEAD
               <div className="cards-grid">
                 {[0, 1, 2, 3].map((colIdx) => (
                   <div className="cards-column" key={colIdx}>
@@ -1829,9 +1467,7 @@ export default function App() {
                           onSubmit={handleQuickSubmit}
                           onToggle={toggleStatus}
                           onArchive={toggleArchive}
-                          onDelete={setConfirmItem}
-                          onEdit={setEditItem}
-                          onMenu={setCtxMenu}
+                          onMenu={handleOrderMenu}
                           readOnly={isReadOnly}
                           isCapital={isCapitalClient(client)}
                           filterRegion={filterRegion}
@@ -1843,22 +1479,6 @@ export default function App() {
                         />
                       ))}
                   </div>
-=======
-              <div className="cards-row">
-                {Object.entries(grouped).map(([client, list]) => (
-                  <ClientCard
-                    key={client}
-                    client={client}
-                    list={list}
-                    quickForm={quickForm}
-                    setQuickForm={setQuickForm}
-                    onSubmit={handleQuickSubmit}
-                    onToggle={toggleStatus}
-                    onDelete={(o) => setConfirmItem(o)}
-                    onEdit={setEditOrder}
-                    readOnly={isReadOnly}
-                  />
->>>>>>> 09ea083a44859e5199b139197b5876e66ceeb309
                 ))}
               </div>
             )}
